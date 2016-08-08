@@ -3,14 +3,16 @@
 
 class iotHubLib {
 private:
-  char iothub_server[] = ""; // the location of the server including port of the server if not the standard 80
+  char iothub_server[] = ""; // the location of the server
+  int iothub_port= 80;
+
   WiFiClient client;
   int tick_time = 10000; // default of 10 seconds
-  long sensorId[];
+  long sensor_ids[]; // array of sensor ID's
 
   void Connect() {
     Serial.print("Attempting to connect to server\n");
-    if (client.connect(server, 80) ) {
+    if (client.connect(iothub_server, iothub_port) ) {
       Serial.println("connected to server");
     }
   }
@@ -25,15 +27,12 @@ private:
 
   }
 
-  // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
-  void RegisterSensor() {}
-
-
 
 public:
   iotHubLib(char[] server) {
     iothub_server = server;
     Connect();
+
   }
 
   void StartConfig() {}
@@ -57,5 +56,10 @@ public:
 
       // send the json
       root.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
+  }
+
+  // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
+  void RegisterSensor() {
+    
   }
 }
