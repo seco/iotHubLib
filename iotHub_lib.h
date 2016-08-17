@@ -8,7 +8,7 @@ private:
 
   WiFiClient client;
   int tick_time = 10000; // default of 10 seconds
-  long sensor_ids[]; // array of sensor ID's
+  String sensor_ids[]; // array of sensor ID's
 
   void Connect() {
     Serial.print("Attempting to connect to server\n");
@@ -17,27 +17,28 @@ private:
     }
   }
 
-  // this should read sensor ID's from internal memory if available
+  // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
 
   }
 
   // this should save sensor ID's TO internal memory
   void SaveSensors() {
-
   }
 
 
 public:
-  iotHubLib(char[] server) {
+  // constructor cannot contain parameters?
+  iotHubLib() {
     iothub_server = server;
+    iothub_port = port;
     Connect();
 
   }
 
   void StartConfig() {}
 
-  void Send(sensor_value) {
+  void Send(float sensor_value) {
       // Make a HTTP post
       client.println("POST /api/sensors/"+ sensorId +"/data");
 
@@ -60,6 +61,6 @@ public:
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
   void RegisterSensor() {
-    
+
   }
 }
