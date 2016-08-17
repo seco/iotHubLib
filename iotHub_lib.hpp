@@ -45,19 +45,19 @@ public:
 
       // prep the json object
       StaticJsonBuffer<50> jsonBuffer;
-      JsonObject& root = jsonBuffer.createObject();
-      root["value"] = sensor_value;
+      JsonObject& json_obj = jsonBuffer.createObject();
+      json_obj["value"] = sensor_value;
 
       client.println(" HTTP/1.1");
       client.print("Host: "); client.println(iothub_server);
       client.println("Content-Type: application/json"); // important! JSON conversion in nodejs requires this
 
       // send length of the json to come
-      client.print("Content-Length: "); client.println(json.length());
+      client.print("Content-Length: "); client.println(json_obj.measureLength());
       client.println();
 
       // send the json
-      root.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
+      json_obj.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
   }
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
