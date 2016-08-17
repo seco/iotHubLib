@@ -1,9 +1,8 @@
 #include "iotHub_lib.hpp"
 
-iotHubLib client;
+iotHubLib client("callum-desktop",3000);
 
 void setup() {
-  client = iotHubLib("callum-desktop",3000);
 }
 
 void loop() {}
