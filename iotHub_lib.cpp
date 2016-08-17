@@ -3,7 +3,7 @@
 
 class iotHubLib {
 private:
-  char iothub_server[] = ""; // the location of the server
+  char iothub_server[]; // the location of the server
   int iothub_port= 80;
 
   WiFiClient client;
@@ -26,15 +26,17 @@ private:
   void SaveSensors() {
   }
 
-
 public:
   // constructor cannot contain parameters?
-  iotHubLib() {
+  ~iotHubLib() {
+  }
+  // this is the actual constructor
+  iotHubLib(char[] server, int port) {
     iothub_server = server;
     iothub_port = port;
     Connect();
-
   }
+
 
   void StartConfig() {}
 

@@ -1,4 +1,4 @@
-#include "iotHub_lib.h"
+#include "iotHub_lib.hpp"
 
 iotHubLib client;
 
