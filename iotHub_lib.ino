@@ -3,7 +3,7 @@
 iotHubLib client;
 
 void setup() {
-  client = new iotHubLib("callum-desktop",3000);
+  client = iotHubLib("callum-desktop",3000);
 }
 
 void loop() {}
