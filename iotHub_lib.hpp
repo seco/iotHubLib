@@ -28,17 +28,13 @@ private:
 
 public:
   // constructor cannot contain parameters?
-  iotHubLib() {
-  }
-
-  // destructor
-  ~iotHubLib() {
-  }
-
-  void Start(char* server, int port) {
+  iotHubLib(char* server, int port) {
     iothub_server = server;
     iothub_port = port;
     Connect();
+  }
+  // destructor
+  ~iotHubLib() {
   }
 
   void StartConfig() {}
@@ -57,7 +53,7 @@ public:
       client.println("Content-Type: application/json"); // important! JSON conversion in nodejs requires this
 
       // send length of the json to come
-      client.print("Content-Length: "); client.println(jsonBuffer.length());
+      client.print("Content-Length: "); client.println(json.length());
       client.println();
 
       // send the json
