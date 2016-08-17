@@ -15,16 +15,15 @@ private:
     if (client.connect(iothub_server, 80) ) {
       Serial.println("connected to server");
     }
-  }
+  };
 
   // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
-
-  }
+  };
 
   // this should save sensor ID's TO internal memory
   void SaveSensors() {
-  }
+  };
 
 public:
   // constructor cannot contain parameters?
@@ -32,12 +31,12 @@ public:
     iothub_server = server;
     iothub_port = port;
     Connect();
-  }
+  };
   // destructor
   ~iotHubLib() {
-  }
+  };
 
-  void StartConfig() {}
+  void StartConfig() {};
 
   void Send(uint sensor_index,float sensor_value) {
       // Make a HTTP post
@@ -58,10 +57,11 @@ public:
 
       // send the json
       json_obj.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
-  }
+  };
 
+  // should take in a callback
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
   void RegisterSensor() {
+  };
 
-  }
-}
+};
