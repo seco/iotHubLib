@@ -6,7 +6,7 @@ iotHubLib<2> iothub("callum-desktop",3000);
 
 void setup() {
   // add sensors
-  char  *names[] = {"Temperature Sensor 1","Temperature Sensor 2"};
+  char *names[] = {"Temperature Sensor 1","Temperature Sensor 2"};
   iothub.RegisterSensors(names);
 }
 

@@ -1,6 +1,7 @@
 #include "ArduinoJson.h"
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <EEPROM.h>
 
 template<uint array_size> class iotHubLib {
 private:
@@ -15,13 +16,34 @@ private:
 
   // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
+    Serial.print("Read bytes: ");
+    int addr = 0;
+    for(int i = 0; i< 512;i++) {
+      Serial.print(EEPROM.read(addr));
+      addr++;
+    }
+    Serial.println(" //end");
   };
 
-  // this should save sensor ID's TO internal memory
+  // this should save sensor ID's to internal memory
   void SaveSensors() {
+    int addr = 0;
+    for(int i = 0; i< array_size;i++) {
+
+      for(int j = 0; j < 24;j++) {
+          EEPROM.write(addr, sensor_ids[i][j] );
+          addr++;
+      }
+
+    }
+    Serial.print("Wrote bytes: "); Serial.println(addr);
   };
 
-  void RegisterSensor(char* sensor_name, char sensor_id[25] ) {
+  void GetIdFromJson(String json_string, char sensor_id[25]) {
+
+  }
+
+  void RegisterSensor(char* sensor_name) {
     Serial.println("Registering sensor");
     HTTPClient http;
 
@@ -54,6 +76,7 @@ public:
     iothub_server = server;
     iothub_port = port;
     Serial.begin(115200);
+    EEPROM.begin(512); // so we can read / write EEPROM
     LoadSensors();
   };
   // destructor
@@ -61,6 +84,7 @@ public:
   };
 
   void StartConfig() {};
+
 
   void Send(uint sensor_index,float sensor_value) {
       HTTPClient http;
@@ -93,7 +117,7 @@ void RegisterSensors(char* sensor_names[]) {
     if (!sensor_configs_loaded) {
 
       for(uint i=0; i < array_size;i++ ) {
-         RegisterSensor(sensor_names[i],sensor_ids[i]);
+         RegisterSensor(sensor_names[i]);
       }
 
     } else {
