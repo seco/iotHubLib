@@ -67,7 +67,9 @@ private:
   };
 
   void GetIdFromJson(String json_string, char sensor_id[25]) {
-
+    StaticJsonBuffer<100> jsonBuffer;
+    JsonObject& json_object = jsonBuffer.parseObject(json_string);
+    sensor_id = (char*)json_object["id"];
   }
 
   void RegisterSensor(char* sensor_name) {
@@ -91,8 +93,10 @@ private:
     http.POST(json_string);
 
     // then print the response over Serial
-    Serial.print("Response: ");
-    Serial.println( http.getString() );
+    Serial.print("Response ID: ");
+    char sensor_id[25] = "";
+    GetIdFromJson(http.getString(),sensor_id);
+    Serial.println( sensor_id );
 
     http.end();
   }
