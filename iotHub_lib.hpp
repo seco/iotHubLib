@@ -1,7 +1,7 @@
 #include "ArduinoJson.h"
 #include <ESP8266WiFi.h>
 
-class iotHubLib {
+template<uint array_size> class iotHubLib {
 private:
   char* iothub_server; // the location of the server
   int iothub_port= 80;
@@ -10,7 +10,8 @@ private:
   WiFiClient client;
 
   int tick_time = 10000; // default of 10 seconds
-  char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
+  char sensor_ids[array_size][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
+  //char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
 
   void Connect() {
     Serial.print("Attempting to connect to server\n");
@@ -66,7 +67,7 @@ public:
 
   void Send(uint sensor_index,float sensor_value) {
       // Make a HTTP post
-      client.print("POST /api/sensors/"); client.print(*sensor_ids[sensor_index]); client.println("/data");
+      client.print("POST /api/sensors/"); client.print(sensor_ids[sensor_index]); client.println("/data");
 
       // prep the json object
       StaticJsonBuffer<50> jsonBuffer;
@@ -86,14 +87,12 @@ public:
   };
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
-void RegisterSensors(char* sensor_names[],uint number_sensors) {
+void RegisterSensors(char* sensor_names[]) {
     if (!sensor_configs_loaded) {
 
-      char* tmp_sensor_ids[number_sensors][25];
-      for(uint i=0; i < number_sensors;i++ ) {
-         RegisterSensor(sensor_names[i],tmp_sensor_ids[i]);
+      for(uint i=0; i < array_size;i++ ) {
+         RegisterSensor(sensor_names[i],sensor_ids[i]);
       }
-      sensor_ids = tmp_sensor_ids;
 
     } else {
       Serial.println("Sensor already registered");
