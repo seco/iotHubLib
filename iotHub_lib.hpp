@@ -36,6 +36,7 @@ private:
       }
 
     }
+    EEPROM.commit();
     Serial.print("Wrote bytes: "); Serial.println(addr);
   };
 
