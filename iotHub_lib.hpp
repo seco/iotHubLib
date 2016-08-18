@@ -6,8 +6,7 @@
 template<uint array_size> class iotHubLib {
 private:
   char* iothub_server; // the location of the server
-  int iothub_port= 80;
-  bool sensor_configs_loaded = false;
+  int iothub_port = 80;
 
 
   int tick_time = 10000; // default of 10 seconds
@@ -15,18 +14,35 @@ private:
   //char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
 
 
-void ClearEeprom() {
-  // clear eeprom
-  for (int i = 0 ; i < 256 ; i++) {
-    EEPROM.write(i, 0);
+  void ClearEeprom() {
+    // clear eeprom
+    for (int i = 0 ; i < 256 ; i++) {
+      EEPROM.write(i, 0);
+    }
+    EEPROM.commit();
   }
-  EEPROM.commit();
-}
+
+  bool CheckFirstBoot() {
+    // check first byte is set to 128, this indicates this is not the first boot
+    if ( 128 == EEPROM.read(0) ) {
+      Serial.println("Previous boot detected, loading existing sensor configs");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void UpdateFirstBoot() {
+    // check first byte is set to 128, this indicates this is not the first boot
+    EEPROM.write(0,128);
+  }
 
   // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
+    // first byte reserved
+    int addr = 1;
     Serial.print("Read bytes: ");
-    int addr = 0;
+
     for(int i = 0; i< 256;i++) {
       Serial.print( (char)EEPROM.read(addr));
       addr++;
@@ -36,7 +52,8 @@ void ClearEeprom() {
 
   // this should save sensor ID's to internal memory
   void SaveSensors() {
-    int addr = 0;
+    // first byte reserved
+    int addr = 1;
     for(int i = 0; i< array_size;i++) {
 
       for(int j = 0; j < 24;j++) {
@@ -124,15 +141,19 @@ public:
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
 void RegisterSensors(char* sensor_names[]) {
-    if (!sensor_configs_loaded) {
-
+    // if first boot
+    if (CheckFirstBoot()) {
+      // ClearEeprom
+      ClearEeprom();
+      // register sensors
       for(uint i=0; i < array_size;i++ ) {
          RegisterSensor(sensor_names[i]);
       }
-
+      // change boot status
+      UpdateFirstBoot();
     } else {
-      Serial.println("Sensor already registered");
+      // otherwise load from eeprom
+      Serial.println("Sensor already loading from eeprom");
     }
   };
-
 };
