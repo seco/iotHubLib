@@ -28,7 +28,7 @@ private:
   void SaveSensors() {
   };
 
-  void RegisterSensor(char* sensor_name, char* sensor_id[25] ) {
+  void RegisterSensor(char* sensor_name, char sensor_id[25] ) {
     Serial.println("Registering sensor");
     // Make a HTTP post
     client.println("POST /api/sensors");

@@ -1,13 +1,13 @@
 #include "iotHub_lib.hpp"
 
-//#define number_sensors = 2
 
 iotHubLib<2> iothub("callum-desktop",3000);
 
 
 void setup() {
   // add sensors
-  iothub.RegisterSensors(["Temperature Sensor 1","Temperature Sensor 2"]);
+  char  *names[] = {"Temperature Sensor 1","Temperature Sensor 2"};
+  iothub.RegisterSensors(names);
 }
 
 void loop() {
