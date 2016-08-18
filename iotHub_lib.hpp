@@ -14,12 +14,21 @@ private:
   char sensor_ids[array_size][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
   //char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
 
+
+void ClearEeprom() {
+  // clear eeprom
+  for (int i = 0 ; i < 256 ; i++) {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.commit();
+}
+
   // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
     Serial.print("Read bytes: ");
     int addr = 0;
-    for(int i = 0; i< 512;i++) {
-      Serial.print(EEPROM.read(addr));
+    for(int i = 0; i< 256;i++) {
+      Serial.print( (char)EEPROM.read(addr));
       addr++;
     }
     Serial.println(" //end");
