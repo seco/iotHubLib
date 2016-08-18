@@ -10,7 +10,7 @@ private:
   WiFiClient client;
 
   int tick_time = 10000; // default of 10 seconds
-  String sensor_ids[]; // array of sensor ID's
+  char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
 
   void Connect() {
     Serial.print("Attempting to connect to server\n");
@@ -26,6 +26,28 @@ private:
   // this should save sensor ID's TO internal memory
   void SaveSensors() {
   };
+
+  void RegisterSensor(char* sensor_name, char* sensor_id[25] ) {
+    Serial.println("Registering sensor");
+    // Make a HTTP post
+    client.println("POST /api/sensors");
+
+    // prep the json object
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& json_obj = jsonBuffer.createObject();
+    json_obj["name"] = sensor_name;
+
+    client.println(" HTTP/1.1");
+    client.print("Host: "); client.println(iothub_server);
+    client.println("Content-Type: application/json"); // important! JSON conversion in nodejs requires this
+
+    // send length of the json to come
+    client.print("Content-Length: "); client.println(json_obj.measureLength());
+    client.println();
+
+    // send the json
+    json_obj.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
+  }
 
 public:
   // constructor cannot contain parameters?
@@ -44,7 +66,7 @@ public:
 
   void Send(uint sensor_index,float sensor_value) {
       // Make a HTTP post
-      client.println("POST /api/sensors/"+ sensor_ids[sensor_index] +"/data");
+      client.print("POST /api/sensors/"); client.print(*sensor_ids[sensor_index]); client.println("/data");
 
       // prep the json object
       StaticJsonBuffer<50> jsonBuffer;
@@ -64,29 +86,17 @@ public:
   };
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
-  void RegisterSensor(char* sensor_name) {
+void RegisterSensors(char* sensor_names[],uint number_sensors) {
     if (!sensor_configs_loaded) {
-      serial.println("Registering sensor");
-      // Make a HTTP post
-      client.println("POST /api/sensors");
 
-      // prep the json object
-      StaticJsonBuffer<200> jsonBuffer;
-      JsonObject& json_obj = jsonBuffer.createObject();
-      json_obj["name"] = sensor_name;
+      char* tmp_sensor_ids[number_sensors][25];
+      for(uint i=0; i < number_sensors;i++ ) {
+         RegisterSensor(sensor_names[i],tmp_sensor_ids[i]);
+      }
+      sensor_ids = tmp_sensor_ids;
 
-      client.println(" HTTP/1.1");
-      client.print("Host: "); client.println(iothub_server);
-      client.println("Content-Type: application/json"); // important! JSON conversion in nodejs requires this
-
-      // send length of the json to come
-      client.print("Content-Length: "); client.println(json_obj.measureLength());
-      client.println();
-
-      // send the json
-      json_obj.printTo(client);// this is great except it seems to be adding quotation marks around what it is sending
     } else {
-      serial.println("Sensor already registered");
+      Serial.println("Sensor already registered");
     }
   };
 

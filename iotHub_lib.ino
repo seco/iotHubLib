@@ -4,10 +4,11 @@ iotHubLib iothub("callum-desktop",3000);
 
 void setup() {
   // add sensors
-
-  uint temp_sensor_1 = iothub.RegisterSensor("Temperature Sensor 1");
-  uint temp_sensor_2 = iothub.RegisterSensor("Temperature Sensor 2");
-
+  iothub.RegisterSensors(["Temperature Sensor 1","Temperature Sensor 2"],2);
 }
 
-void loop() {}
+void loop() {
+  // iothub.SetValue(0,10.1)
+  // iothub.SetValue(1,11.12)
+  iothub.Update
+}
