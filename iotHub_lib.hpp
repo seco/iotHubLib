@@ -73,7 +73,7 @@ private:
     JsonObject& json_object = jsonBuffer.parseObject(json_string);
     const char* id = json_object["id"];
     //strcpy (to,from)
-    strcpy (*sensor_id,"new0000000000000000000");
+    strcpy (*sensor_id,id);
   }
 
   void RegisterSensor(char* sensor_name) {
