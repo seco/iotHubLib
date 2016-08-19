@@ -26,9 +26,10 @@ private:
     // check first byte is set to 128, this indicates this is not the first boot
     if ( 128 == EEPROM.read(0) ) {
       Serial.println("Previous boot detected, loading existing sensor configs");
-      return true;
-    } else {
       return false;
+    } else {
+      Serial.print("BootByte: "); Serial.println(EEPROM.read(0));
+      return true;
     }
   }
 
@@ -69,7 +70,8 @@ private:
   void GetIdFromJson(String json_string, char sensor_id[25]) {
     StaticJsonBuffer<100> jsonBuffer;
     JsonObject& json_object = jsonBuffer.parseObject(json_string);
-    sensor_id = (char*)json_object["id"];
+    const char* id = json_object["id"];
+    Serial.println(id);
   }
 
   void RegisterSensor(char* sensor_name) {
@@ -94,7 +96,7 @@ private:
 
     // then print the response over Serial
     Serial.print("Response ID: ");
-    char sensor_id[25] = "";
+    char sensor_id[25];
     GetIdFromJson(http.getString(),sensor_id);
     Serial.println( sensor_id );
 
