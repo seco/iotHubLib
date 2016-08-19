@@ -10,8 +10,7 @@ private:
 
 
   int tick_time = 10000; // default of 10 seconds
-  char sensor_ids[array_size][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
-  //char* sensor_ids[][25]; // array of sensor ID's, sensor ids are 25 alphanumeric keys long
+  char sensor_ids[array_size][24]; // array of sensor ID's, sensor ids are 24 alphanumeric keys long
 
 
   void ClearEeprom() {
@@ -68,7 +67,7 @@ private:
     Serial.print("Wrote bytes: "); Serial.println(addr);
   };
 
-  void GetIdFromJson(String json_string, char (*sensor_id)[25]) {
+  void GetIdFromJson(String json_string, char (*sensor_id)[24]) {
     StaticJsonBuffer<100> jsonBuffer;
     JsonObject& json_object = jsonBuffer.parseObject(json_string);
     const char* id = json_object["id"];
@@ -98,7 +97,7 @@ private:
 
     // then print the response over Serial
     Serial.print("Response ID: ");
-    char sensor_id[25] = "original0000000000000001";
+    char sensor_id[24] = "original000000000000001";
     GetIdFromJson(http.getString(),&sensor_id);
 
     Serial.print(sensor_id); Serial.println("///end");
