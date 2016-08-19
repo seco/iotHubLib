@@ -10,6 +10,7 @@ private:
 
 
   int tick_time = 10000; // default of 10 seconds
+  const int sensor_ids_eeprom_offset = 1; // memory location for sensor ids start +1, skipping zero
   char sensor_ids[array_size][24]; // array of sensor ID's, sensor ids are 24 alphanumeric keys long
 
 
@@ -38,23 +39,41 @@ private:
     EEPROM.write(0,128);
   }
 
+  void ShowEeprom() {
+    // first byte reserved
+    Serial.println();
+    Serial.print("Read bytes: ");
+
+    for(int addr = 0; addr < 48 + sensor_ids_eeprom_offset;) {
+      Serial.print("[");
+      Serial.print( (char)EEPROM.read(addr));
+      Serial.print("] ");
+      addr++;
+    }
+    Serial.println("//end");
+  }
+
   // this should read sensor ID's from internal memory if available, else ask for new ids from the given server
   void LoadSensors() {
     // first byte reserved
-    int addr = 1;
-    Serial.print("Read bytes: ");
+    int addr = sensor_ids_eeprom_offset;
+    for(int i = 0; i< array_size;i++) {
 
-    for(int i = 0; i< 256;i++) {
-      Serial.print( (char)EEPROM.read(addr));
-      addr++;
+      for(int j = 0; j < 24;j++) {
+          sensor_ids[i][j] = (char)EEPROM.read(addr);
+          addr++;
+      }
+      Serial.print("Read from eeprom into sensor_ids: "); Serial.println(sensor_ids[i]);
+
     }
-    Serial.println(" //end");
+    EEPROM.commit();
+    Serial.print("Read bytes: "); Serial.println(addr-sensor_ids_eeprom_offset);
   };
 
   // this should save sensor ID's to internal memory
   void SaveSensors() {
     // first byte reserved
-    int addr = 1;
+    int addr = sensor_ids_eeprom_offset;
     for(int i = 0; i< array_size;i++) {
 
       for(int j = 0; j < 24;j++) {
@@ -64,7 +83,7 @@ private:
 
     }
     EEPROM.commit();
-    Serial.print("Wrote bytes: "); Serial.println(addr);
+    Serial.print("Wrote bytes: "); Serial.println(addr-sensor_ids_eeprom_offset);
   };
 
   void GetIdFromJson(String json_string, char (*sensor_id)[24]) {
@@ -75,7 +94,7 @@ private:
     strcpy (*sensor_id,id);
   }
 
-  void RegisterSensor(char* sensor_name) {
+  void RegisterSensor(char* sensor_name,char (*sensor_id)[24]) {
     Serial.println("Registering sensor");
     HTTPClient http;
 
@@ -97,10 +116,9 @@ private:
 
     // then print the response over Serial
     Serial.print("Response ID: ");
-    char sensor_id[24] = "original000000000000001";
-    GetIdFromJson(http.getString(),&sensor_id);
+    GetIdFromJson(http.getString(),*&sensor_id);
 
-    Serial.print(sensor_id); Serial.println("///end");
+    Serial.print(*sensor_id); Serial.println("///end");
     //Serial.println( sensor_id );
 
     http.end();
@@ -150,19 +168,23 @@ public:
 
   // this should post to /api/sensors with the requested sensor, this will then return an ID that can be used
 void RegisterSensors(char* sensor_names[]) {
+    ShowEeprom();
     // if first boot
-    if (CheckFirstBoot()) {
+    if ( CheckFirstBoot() ) {
       // ClearEeprom
-      ClearEeprom();
+      //ClearEeprom();
       // register sensors
       for(uint i=0; i < array_size;i++ ) {
-         RegisterSensor(sensor_names[i]);
+         RegisterSensor(sensor_names[i],&sensor_ids[i]);
       }
+      SaveSensors();
       // change boot status
       UpdateFirstBoot();
     } else {
       // otherwise load from eeprom
       Serial.println("Sensor already loading from eeprom");
+      LoadSensors();
     }
+    ShowEeprom();
   };
 };
