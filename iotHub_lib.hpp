@@ -37,6 +37,7 @@ private:
   void UpdateFirstBoot() {
     // check first byte is set to 128, this indicates this is not the first boot
     EEPROM.write(0,128);
+    EEPROM.commit();
   }
 
   void ShowEeprom() {
